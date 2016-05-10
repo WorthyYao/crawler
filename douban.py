@@ -3,22 +3,26 @@
 import urllib2
 import re
 from  lxml import etree
+
+
+
+
 info=open('douban.txt','w')
 
 
 class DBDS:
     def __init__(self):
-        self.baseurl="https://book.douban.com/tag/小说?start=20"
+        self.baseurl="https://book.douban.com/tag/"
         self.pageIndex=0
 
-    def getPage(self,pageIndex):
-        url="https://book.douban.com/tag/小说?start="+str(pageIndex)
+    def getPage(self,baseurl,pageIndex):
+        url=baseurl+str(pageIndex)
         return url
 
 
-    def list_html_crawl(self,url):
+    def list_html_crawl(self,urls):
 
-        content=urllib2.urlopen("https://book.douban.com/tag/小说?start=20&type=T").read()
+        content=urllib2.urlopen(urls).read()
         re_info=r'<h2 class.*?>.*?</h2>'
         content=re.findall(re_info,content,re.S|re.M)
         for con in content:
@@ -43,10 +47,19 @@ class DBDS:
                 info.write(nums+'\n')
 
     def start(self):
-        while(self.pageIndex<=20):
-            url=self.getPage(self.pageIndex)
-            self.list_html_crawl(url)
-            self.pageIndex+=20
+        base_tag_html=urllib2.urlopen("https://book.douban.com/tag").read()
+
+        re_tag=r'<a href="/tag/(.*?)"'
+        base_tag=re.findall(re_tag,base_tag_html,re.S|re.M)
+
+        for tag in base_tag:
+            self.pageIndex=0
+            baseurl=self.baseurl+tag+"?start="
+            while(self.pageIndex<=20):
+                url=self.getPage(baseurl,self.pageIndex)
+                self.pageIndex+=20
+                print "*******开始下载"+url+"下的20本书************\n"
+                self.list_html_crawl(url)
 
 
 
