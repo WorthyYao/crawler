@@ -46,6 +46,3 @@ for school in school_list:
 
         except urllib2.HTTPError,e:
             e.code
-
-
-
