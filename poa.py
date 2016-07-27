@@ -20,7 +20,7 @@ school_list=['上海交通大学','同济大学','复旦大学','华东师范大
 for school in school_list:
     os.mkdir(school)
     count=0
-    for i in range(0,41,20):
+    for i in range(0,401,20):
         url=base_url.format(school=school,number=i)
         print url
         time.sleep(4)
