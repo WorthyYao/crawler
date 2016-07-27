@@ -45,4 +45,4 @@ for school in school_list:
                     print e
 
         except urllib2.HTTPError,e:
-            e.code
+            print e.reason
