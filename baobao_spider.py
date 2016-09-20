@@ -8,6 +8,7 @@ conn=MongoClient('localhost',27017)
 baby_db = conn.baby
 
 coll_baby=baby_db['baby']
+coll_url=baby_db['url']
 
 browse_base_url="http://baobao.baidu.com/browse?pn="
 detail_base_url="http://baobao.baidu.com/question/ajax/replymore?qid="
@@ -37,26 +38,30 @@ for i in range(0,1,20):
 
             time.sleep(1)
             try:
+                #判断url是否重复
+                count=coll_url.find({"url":detail_url}).count()
+                if(count==0):
+                    coll_url.insert({"url":detail_url})
 
-                html=urllib2.urlopen(detail_url).read()
-                print "process"+' '+detail_url
+                    html=urllib2.urlopen(detail_url).read()
+                    print "process"+' '+detail_url
 
-                solution=[]
-                answers=re.findall(re_answer,html,re.S|re.M)
-                usernames=re.findall(re_username,html,re.S|re.M)
-                dates=re.findall(re_date,html,re.S|re.M)
+                    solution=[]
+                    answers=re.findall(re_answer,html,re.S|re.M)
+                    usernames=re.findall(re_username,html,re.S|re.M)
+                    dates=re.findall(re_date,html,re.S|re.M)
 
-                for j in range(len(answers)):
-                    answer=answers[j]
-                    username=usernames[j]
-                    date=dates[j]
-                    data={"answer":answer,"username":username,"date":date}
-                    solution.append(data)
+                    for j in range(len(answers)):
+                        answer=answers[j]
+                        username=usernames[j]
+                        date=dates[j]
+                        data={"answer":answer,"username":username,"date":date}
+                        solution.append(data)
 
-                result={}
-                result['solution']=solution
+                    result={}
+                    result['solution']=solution
 
-                coll_baby.insert(result)
+                    coll_baby.insert(result)
             except urllib2.HTTPError, e:
                 print e.code
             except urllib2.URLError, e:
